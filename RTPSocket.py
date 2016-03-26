@@ -1,6 +1,6 @@
 import socket
 
-import RxPPacket
+import RTPPacket
 import pickle
 
 class SocketState:
@@ -14,18 +14,18 @@ CONNECTION_TIMEOUT_LIMIT = 1
 LISTEN_TIMEOUT_LIMIT = 100
 RECEIVE_TIMEOUT_LIMIT = 20
 
-class RxPSocket:
+class RTPSocket:
 	CONNECTION_TIMEOUT_LIMIT = CONNECTION_TIMEOUT_LIMIT
 	LISTEN_TIMEOUT_LIMIT = LISTEN_TIMEOUT_LIMIT
 	RECEIVE_TIMEOUT_LIMIT = RECEIVE_TIMEOUT_LIMIT
 
 	def __init__(self):
-		print("Initializing new RxPSocket")
+		print("Initializing new RTPSocket")
 		self._socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 		self.state = SocketState.NONE 
 		self.send_window = 1
-		self.receive_window_size = RxPPacket.MAX_WINDOW_SIZE
+		self.receive_window_size = RTPPacket.MAX_WINDOW_SIZE
 
 		self.source_address = None
 		self.destination_address = None 
@@ -44,10 +44,10 @@ class RxPSocket:
 		print("Socket has been bound! ", str(self))
 
 	def close(self):
-		print("Closing RxPSocket: ", str(self))
+		print("Closing RTPSocket: ", str(self))
 		self._socket.close()
 		self.state = SocketState.CLOSED
-		print("Closed RxPSocket: ", str(self))
+		print("Closed RTPSocket: ", str(self))
 
 	def setTimeout(self, value):
 		self._socket.settimeout(value)
@@ -55,15 +55,15 @@ class RxPSocket:
 
 	def connect(self, destination_address):
 		if not self.state == SocketState.BOUND:
-			raise RxPException("Socket not bound yet")
+			raise RTPException("Socket not bound yet")
 		elif self.state == SocketState.CONNECTED:
-			raise RxPException("Socket already connected")
+			raise RTPException("Socket already connected")
 
 		self.destination_address = destination_address
 		self.state = SocketState.CONNECTED
 
-	def sendPacket(self, rxp_packet):
-		self._socket.sendto(rxp_packet.byteVersion(), self.destination_address)
+	def sendPacket(self, rtp_packet):
+		self._socket.sendto(rtp_packet.byteVersion(), self.destination_address)
 
 	def receivePacket(self, receive_window_size):
 		self._socket.settimeout(CONNECTION_TIMEOUT_LIMIT)
@@ -73,7 +73,7 @@ class RxPSocket:
 				print "packet received"
 				packet = self.unpicklePacket(packet)
 				packet_type = type(packet)
-				if not isinstance(packet, RxPPacket.RxPPacket):
+				if not isinstance(packet, RTPPacket.RTPPacket):
 					print("Packet was managled, not correct type!.  Got: ", packet_type)
 					continue
 

@@ -1,4 +1,4 @@
-from RxPPacketHeader import RxPPacketHeader
+from RTPPacketHeader import RTPPacketHeader
 import math
 import pickle
 import md5
@@ -8,7 +8,7 @@ MAX_PAYLOAD_LENGTH = math.pow(2,9) # in bytes
 MAX_PACKET_SIZE = math.pow(2,10)
 MAX_RESEND_LIMIT = math.pow(2,5) #idk
 
-class RxPPacket:
+class RTPPacket:
 	MAX_WINDOW_SIZE = MAX_WINDOW_SIZE 
 	MAX_PAYLOAD_LENGTH = MAX_PAYLOAD_LENGTH
 	MAX_PACKET_SIZE = MAX_PACKET_SIZE
@@ -16,7 +16,7 @@ class RxPPacket:
 	
 
 	def __init__(self, header=None, payload=None):
-		self.header = header or RxPPacketHeader()
+		self.header = header or RTPPacketHeader()
 		self.payload = payload
 		if self.payload is None or self.payload == None:
 			self.payload = '_'
