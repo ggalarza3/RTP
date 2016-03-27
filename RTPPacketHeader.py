@@ -1,11 +1,11 @@
-class RxPPacketHeader:
+class RTPPacketHeader:
 	
-	def __init__(self):	
-		self.src_port = 0
-		self.dest_port = 0
-
+	def create(self):
 		self.seq_number = 0
 		self.ack_number = 0
+
+		self.src_port = 0
+		self.dest_port = 0
 		
 		self.syn_flag = 0
 		self.ack_flag = 0
@@ -15,17 +15,18 @@ class RxPPacketHeader:
 
 		self.rcv_window = 0
 
-		self.checksum = 0
 		self.payload_length = 0
 
 	def toString(self):
-		return "" + str(self.src_port) + str(self.dest_port) + str(self.seq_number) \
-		+ str(self.ack_number) + str(self.syn_flag ) + str(self.ack_flag ) \
-		+ str(self.fin_flag ) + str(self.lst_flag ) + str(self.rst_flag) \
-		+ str(self.payload_length ) + str(self.rcv_window)
-
-		# todo do we include rcv_window?
-
-
-
-	
+		return "" + \
+               "Src Port: " + str(self.src_port) + \
+               "Dest Port: " + str(self.dest_port) + \
+               "Seq #: " + str(self.seq_number) + \
+		       "Ack #: " + str(self.ack_number) + \
+               "SYN: " + str(self.syn_flag ) + \
+               "ACK: " + str(self.ack_flag ) + \
+		       "FIN: " + str(self.fin_flag ) +\
+               "LST: " + str(self.lst_flag ) + \
+               "RST: " + str(self.rst_flag) + \
+		       "Payload: " + str(self.payload_length ) + \
+               "RCV Win: " + str(self.rcv_window)
