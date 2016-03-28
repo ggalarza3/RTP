@@ -10,6 +10,7 @@ class RTP:
 	@staticmethod
 	def createRTPSocket(ip_address, port_number):
 		socket = RTPSocket()
+		socket.create()
 		source_address = (ip_address, port_number)
 		socket.bind(source_address)
 		return socket
@@ -57,15 +58,15 @@ class RTP:
 		# todo send closing stuff
 
 	@staticmethod
-	def listenForRxPConnections(rxp_socket):
-		if rxp_socket.state == SocketState.NONE:
-			raise RTPException("listenForRxPConnections: Socket not yet bound!")
+	def listenForRTPConnections(s):
+		if s.state == SocketState.CREATED:
+			raise RTPException("listenForRTPConnections: Socket not yet bound!")
 
-		timeout_limit = rxp_socket.LISTEN_TIMEOUT_LIMIT
+		timeout_limit = s.LISTEN_TIMEOUT_LIMIT
 		while timeout_limit > 0:
 			incoming_packet = None
 			try:
-				packet_address, incoming_packet = rxp_socket.receivePacket(RTPPacket.MAX_PACKET_SIZE)
+				packet_address, incoming_packet = s.receivePacket(RTPPacket.MAX_PACKET_SIZE)
 			except RTPException as e:
 				if e.type == RTPException.TIMEOUT or e.type == RTPException.INVALID_CHECKSUM:
 					timeout_limit -= 1
@@ -86,21 +87,21 @@ class RTP:
 	# sends ack to a potential connection
 	# incoming connection is a (src, packet) tuple
 	@staticmethod
-	def acceptRxPSocketConnection(rxp_socket, incoming_address):
-		if rxp_socket.state == SocketState.NONE:
+	def acceptRTPSocketConnection(s, incoming):
+		if s.state == SocketState.CREATED:
 			raise RTPException("acceptRxPSocketConnection: Socket not yet bound!")
-		elif rxp_socket.state != SocketState.BOUND:
+		elif s.state != SocketState.BIND:
 			raise RTPException("acceptRxPSocketConnection: Socket needs to be bound!")
 
 
-		rxp_socket.seq_number = 0
-		rxp_socket.ack_number = 1000
+		s.seq_number = 0
+		s.ack_number = 1000
 
-		rxp_socket.destination_address = incoming_address
+		s.destination_address = incoming
 
-		response = RTP.sendSYNACK(rxp_socket)
+		response = RTP.sendSYNACK(s)
 
-		rxp_socket.state = SocketState.CONNECTED
+		s.state = SocketState.CONNECTED
 		print("Succesfully accepted an RTP connection!")
 
 	@staticmethod

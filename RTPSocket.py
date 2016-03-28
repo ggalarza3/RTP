@@ -23,7 +23,7 @@ class RTPSocket:
 		print("Creating new RTPSocket")
 		self._socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-		self.state = SocketState.NONE 
+		self.state = SocketState.CREATED
 		self.send_window = 1
 		self.receive_window_size = RTPPacket.MAX_WIN
 
