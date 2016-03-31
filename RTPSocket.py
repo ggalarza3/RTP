@@ -19,7 +19,7 @@ class RTPSocket:
 	LISTEN_TIMEOUT_LIMIT = LISTEN_TIMEOUT_LIMIT
 	RECEIVE_TIMEOUT_LIMIT = RECEIVE_TIMEOUT_LIMIT
 
-	def create(self):
+	def __init__(self):
 		print("Creating new RTPSocket")
 		self._socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
@@ -62,6 +62,7 @@ class RTPSocket:
 		self.state = SocketState.CONNECTED
 
 	def sendPacket(self, rtp_packet):
+
 		self._socket.sendto(rtp_packet.toBytes(), self.destination_address)
 
 	def receivePacket(self, rcv_win_size):

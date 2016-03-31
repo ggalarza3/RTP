@@ -1,6 +1,6 @@
 class RTPPacketHeader:
 	
-	def create(self):
+	def __init__(self):
 		self.seq_number = 0
 		self.ack_number = 0
 

@@ -14,7 +14,7 @@ class RTPPacket:
 	MAX_WIN = MAX_WIN
 	MAX_PACK_SIZE = MAX_PACK_SIZE
 
-	def create(self, header=None, payload=None):
+	def __init__(self, header=None, payload=None):
 		self.header = header or RTPPacketHeader()
 		self.payload = payload
 		if self.payload is None or self.payload == None:
@@ -23,6 +23,9 @@ class RTPPacket:
 
 	def toBytes(self):
 		return pickle.dumps(self)
+
+	def setHeader(self, header):
+		self.header = header
 
 	def toStr(self):
 		print("Packet payload: ", self.payload)

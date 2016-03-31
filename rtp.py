@@ -10,10 +10,9 @@ class RTP:
 	@staticmethod
 	def createRTPSocket(ip_address, port_number):
 		socket = RTPSocket()
-		socket.create()
 		source_address = (ip_address, port_number)
-		socket.bind(source_address)
-		return socket
+		###socket.bind(source_address)
+		return source_address, socket
 
 	@staticmethod
 	def closeRTPSocket(rxp_socket):
@@ -105,7 +104,7 @@ class RTP:
 		print("Succesfully accepted an RTP connection!")
 
 	@staticmethod
-	def connectToRxP(rxp_socket, ip_address, port_number):
+	def connectToRTP(rxp_socket, ip_address, port_number):
 		destination_address = (ip_address, port_number)
 		rxp_socket.connect(destination_address)
 
@@ -118,8 +117,8 @@ class RTP:
 		print("Succesfully connected to RxP!")
 
 	@staticmethod
-	def setWindowSize(rxp_socket, window_length):
-		rxp_socket.receive_window_size = window_length
+	def setWindowSize(s, winSize):
+		s.receive_window_size = winSize
 
 	@staticmethod
 	def sendSYN(rxp_socket):
@@ -127,15 +126,16 @@ class RTP:
 
 		header = RTPPacketHeader()
 		header.src_port = rxp_socket.source_address[1]
-		header.dst_port = rxp_socket.destination_address[1]
+		header.dest_port = rxp_socket.destination_address[1]
 		header.syn_flag = 1
 
 		packet = RTPPacket(header)
+		#packet.setHeader(header)
 
-		number_of_resends = RTPPacket.MAX_RESEND_LIMIT
+		number_of_resends = RTPPacket.MAX_RESEND
 
 		while number_of_resends > 0:
-			print "Attempt #", (RTPPacket.MAX_RESEND_LIMIT - number_of_resends) + 1
+			print "Attempt #", (RTPPacket.MAX_RESEND - number_of_resends) + 1
 			rxp_socket.sendPacket(packet)
 			try:
 				address, packet = rxp_socket.receivePacket(RTPPacket.MAX_PACKET_SIZE)

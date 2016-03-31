@@ -17,7 +17,8 @@ BUFFER_SIZE = 20  # Normally 1024, but we want fast response
 
 #create/bind
 global snew
-snew = RTP.createRTPSocket(TCP_IP, TCP_PORT)
+source_address, snew = RTP.createRTPSocket(TCP_IP, TCP_PORT)
+snew.bind(source_address)
 #s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 #s.bind((TCP_IP, TCP_PORT))
 in_conn = RTP.listenForRTPConnections(snew)
@@ -54,14 +55,14 @@ checkFor = []
 
 
 while 1:
-    rtp.acceptRTPSocketConnection(snew, incoming)
-    if rtp.isConnected(snew):
+    RTP.acceptRTPSocketConnection(snew, incoming)
+    if RTP.isConnected(snew):
         thread = threading.Thread(target=listenForServerRequests)
         thread.start()
         threads.append(thread)
     #conn, addr = s.accept()
 
-    data = rtp.receiveData()
+    data = RTP.receiveData()
     #data = conn.recv(BUFFER_SIZE)
 
     if not data :
@@ -74,32 +75,33 @@ while 1:
           IDINDEX = w
           break
       ######conn.send(messageBack)  # echo
-      rtp.sendData(snew, messageBack)
+      RTP.sendData(snew, messageBack)
       if messageBack == 'ID EXISTS':
         ####lstLength = conn.recv(BUFFER_SIZE)
-        lstLength = rtp.receiveData()
+        lstLength = RTP.receiveData()
         ####conn.send("Taking Fields")
-        rtp.sendData(snew, "Taking Fields")
+        
+        RTP.sendData(snew, "Taking Fields")
         errorMsg = ''
         # create list of asked for fields
         for a in range(0, int(lstLength)):
           ####data = conn.recv(BUFFER_SIZE)
-          data = rtp.receiveData()
+          data = RTP.receiveData()
           if (data not in students[w]):
             errorMsg = data + ": This field does not exist"
             checkFor = []
             ####conn.send(errorMsg)
-            rtp.sendData(snew, errorMsg)
+            RTP.sendData(snew, errorMsg)
             break
             #sys.exit()
           else:
             checkFor.append(data)
             ####conn.send("Received: " + data)
-            rtp.sendData(snew, "Received: " + data)
+            RTP.sendData(snew, "Received: " + data)
         #create dictionary to print responses
         if not errorMsg:
           ####conn.recv(BUFFER_SIZE)
-          rtp.receiveData()
+          RTP.receiveData()
           LASTMESSAGE = ''
           i = 0
           for i in range(0, int(lstLength)):
@@ -108,15 +110,15 @@ while 1:
           checkFor = []
           #messageBack = ""
           ####conn.send(LASTMESSAGE)
-          rtp.sendData(snew, LASTMESSAGE)
+          RTP.sendData(snew, LASTMESSAGE)
 
 
-rtp.closeRTPSocket(snew) 
+RTP.closeRTPSocket(snew) 
 
 def listenForServerRequests():
   print "Listening for server requests!"
   while(True):
-      data = rtp.receiveData(snew)
+      data = RTP.receiveData(snew)
       #if "GET" in str(request):
       #    print "GETTING a file"
       #    request = str(request).replace("GET: ", "")
@@ -125,6 +127,6 @@ def listenForServerRequests():
       #with open (request, "r") as myfile:
       #    data = myfile.read()
 
-      rtp.sendData(snew, data)
+      RTP.sendData(snew, data)
 #conn.close()
 

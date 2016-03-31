@@ -14,15 +14,23 @@ TCP_PORT = int(TCP_PORT)
 # buffer size for information being sent
 BUFFER_SIZE = 1024
 
+windowSize = 20
 # setup socket and set to stream for TCP connection
-snew = RTP.createRTPSocket(TCP_IP, TCP_PORT)
 global snew
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-try:
-  s.connect((TCP_IP, TCP_PORT))
-except socket.error, msg:
-  print "Couldn't connect to server. Closing"
-  sys.exit(1)
+source_address, snew = RTP.createRTPSocket(TCP_IP, TCP_PORT)
+
+snew.source_address = source_address
+###s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+print snew
+#RTP.setWindowSize(snew, windowSize)
+
+####try:
+ip, port = snew.source_address
+RTP.connectToRTP(snew, ip, port)
+  ####s.connect((TCP_IP, TCP_PORT))
+####except snew.error, msg:
+  ####print "Couldn't connect to server. Closing"
+  ####sys.exit(1)
 
 studentData = []
 studentID = sys.argv[2]
@@ -41,8 +49,10 @@ while x < len(sys.argv):
 MESSAGE = studentID
 
 # connection established and ready to send ID to check if it exists
-s.send(MESSAGE)
-data = s.recv(BUFFER_SIZE)
+####s.send(MESSAGE)
+RTP.sendData(snew, MESSAGE)
+####data = s.recv(BUFFER_SIZE)
+data = RTP.receiveData()
 
 # check if ID is present
 if data != "ID EXISTS":
@@ -50,20 +60,27 @@ if data != "ID EXISTS":
   sys.exit()
 else:
   # send length of list asked for 
-  s.send(str(len(studentData)))
+  ####s.send(str(len(studentData)))
+  RTP.sendData(snew, str(len(studentData)))
   # receives "Taking Fields"
-  data = s.recv(BUFFER_SIZE)
+  ####data = s.recv(BUFFER_SIZE)
+  data = RTP.receiveData()
   for a in range(0, len(studentData)): # Send over Fields
     MESSAGE = studentData[a]
-    s.send(MESSAGE)
-    data = s.recv(BUFFER_SIZE)
+    ####s.send(MESSAGE)
+    RTP.sendData(MESSAGE)
+    ####data = s.recv(BUFFER_SIZE)
+    data = RTP.receiveData()
     if data == MESSAGE + ": This field does not exist":
       print data
       sys.exit()
 
-  s.send("Final Call")
-  data = s.recv(BUFFER_SIZE)
+  ####s.send("Final Call")
+  RTP.sendData("Final Call")
+  data = RTP.receiveData()
+  ####data = s.recv(BUFFER_SIZE)
   data = data[:-3]
   print 'From server: ' + data
 
-s.close()
+####s.close()
+RTP.closeRTPSocket(snew) 
